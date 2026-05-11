@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8F4EE"/>
+      <stop offset="100%" stop-color="#F2C94C"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#a)"/>
+  <circle cx="450" cy="450" r="220" fill="#E8882A" opacity="0.5"/>
+  <text x="50%" y="88%" text-anchor="middle" font-size="72" fill="#8B1A1A" font-family="serif">Moonlit Jasmine</text>
+</svg>
