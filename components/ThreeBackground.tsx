@@ -1,20 +1,23 @@
+// @ts-nocheck
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, extend } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+
+extend(THREE);
 
 function JasmineParticles({ tilt }: { tilt: { x: number; y: number } }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const particles = useMemo(
     () =>
-      Array.from({ length: 200 }, (_, i) => ({
+      Array.from({ length: 180 }, (_, i) => ({
         x: (((i * 31) % 100) / 100 - 0.5) * 16,
         y: (((i * 17) % 100) / 100 - 0.5) * 14,
         z: (((i * 47) % 100) / 100 - 0.5) * 8,
-        speed: 0.005 + (((i * 11) % 100) / 1000),
+        speed: 0.004 + (((i * 11) % 100) / 1000),
       })),
     [],
   );
@@ -35,8 +38,8 @@ function JasmineParticles({ tilt }: { tilt: { x: number; y: number } }) {
 
   return (
     <instancedMesh ref={mesh} args={[undefined, undefined, particles.length]}>
-      <planeGeometry args={[0.12, 0.12]} />
-      <meshBasicMaterial color="#FFF8DC" transparent opacity={0.65} />
+      <planeGeometry args={[0.1, 0.1]} />
+      <meshBasicMaterial color="#E8D5A3" transparent opacity={0.5} />
     </instancedMesh>
   );
 }
@@ -44,23 +47,40 @@ function JasmineParticles({ tilt }: { tilt: { x: number; y: number } }) {
 function Mandala() {
   const ref = useRef<THREE.Mesh>(null);
   useFrame(() => {
-    if (ref.current) ref.current.rotation.z += 0.0015;
+    if (ref.current) ref.current.rotation.z += 0.001;
   });
   return (
-    <Float speed={0.8} rotationIntensity={0.2} floatIntensity={0.6}>
+    <Float speed={0.6} rotationIntensity={0.15} floatIntensity={0.4}>
       <mesh ref={ref} position={[0, 0, -2]}>
-        <torusGeometry args={[3.4, 0.06, 18, 180]} />
-        <meshBasicMaterial color="#F2C94C" wireframe transparent opacity={0.18} />
+        <torusGeometry args={[3.2, 0.05, 16, 160]} />
+        <meshBasicMaterial color="#C9A962" wireframe transparent opacity={0.12} />
       </mesh>
     </Float>
   );
 }
 
+function InnerRing() {
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame(() => {
+    if (ref.current) ref.current.rotation.z -= 0.0008;
+  });
+  return (
+    <mesh ref={ref} position={[0, 0, -1.5]}>
+      <torusGeometry args={[2.2, 0.03, 12, 100]} />
+      <meshBasicMaterial color="#B8736B" wireframe transparent opacity={0.08} />
+    </mesh>
+  );
+}
+
 export default function ThreeBackground() {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
   useEffect(() => {
     const onMotion = (e: DeviceMotionEvent) => {
-      setTilt({ x: e.accelerationIncludingGravity?.x ?? 0, y: e.accelerationIncludingGravity?.y ?? 0 });
+      setTilt({
+        x: e.accelerationIncludingGravity?.x ?? 0,
+        y: e.accelerationIncludingGravity?.y ?? 0,
+      });
     };
     const onVisibility = () => {
       if (document.hidden) setTilt({ x: 0, y: 0 });
@@ -75,11 +95,12 @@ export default function ThreeBackground() {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-0">
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 7], fov: 50 }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[2, 4, 2]} color="#E8882A" intensity={1.1} />
-        <pointLight position={[-3, -3, 2]} color="#FFF8DC" intensity={0.8} />
+      <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 7], fov: 50 }}>
+        <ambientLight intensity={0.4} />
+        <pointLight position={[2, 4, 2]} color="#C9A962" intensity={0.9} />
+        <pointLight position={[-3, -3, 2]} color="#E8D5A3" intensity={0.6} />
         <Mandala />
+        <InnerRing />
         <JasmineParticles tilt={tilt} />
       </Canvas>
     </div>

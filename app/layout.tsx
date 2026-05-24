@@ -21,7 +21,12 @@ const cinzel = Cinzel_Decorative({
   weight: ["400", "700"],
 });
 
-const greatVibes = Great_Vibes({ variable: "--font-great-vibes", subsets: ["latin"], weight: "400" });
+const greatVibes = Great_Vibes({
+  variable: "--font-great-vibes",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 const crimson = Crimson_Pro({
   variable: "--font-crimson",
   subsets: ["latin"],
@@ -44,7 +49,7 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${cinzel.variable} ${greatVibes.variable} ${crimson.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-marble text-inkstone font-body">
+      <body className="min-h-full bg-ivory text-charcoal font-body">
         <LenisProvider>{children}</LenisProvider>
       </body>
     </html>

@@ -1,29 +1,65 @@
 "use client";
 
-import { MapPin } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { MapPin, Navigation2, Calendar } from "lucide-react";
+import { motion } from "framer-motion";
 import { weddingData } from "@/lib/weddingData";
+import SectionWrapper from "@/components/ui/SectionWrapper";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Button from "@/components/ui/Button";
+import { fadeUp, scaleIn } from "@/lib/animations";
 
 export default function VenueSection() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.2], [60, 0]);
   return (
-    <motion.section ref={ref} style={{ opacity, y }} className="z-20 px-5 py-16">
-      <div className="mx-auto max-w-5xl rounded-3xl border border-silk bg-jasmine/80 p-6">
-        <h2 className="font-display text-5xl text-temple">{weddingData.venue.name}</h2>
-        <p className="mt-2 flex items-center gap-2 font-body text-xl text-copper"><MapPin size={18} /> {weddingData.venue.address}</p>
-        <div className="mt-5 overflow-hidden rounded-xl">
-          <iframe title="map" src={weddingData.venue.mapsEmbed} loading="lazy" className="aspect-video w-full border-0" />
+    <SectionWrapper id="venue" variant="warm">
+      <SectionHeader
+        label="Location"
+        title={weddingData.venue.name}
+        subtitle="Join us at this sacred venue for our celebration"
+      />
+
+      <motion.div
+        variants={scaleIn}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="overflow-hidden rounded-3xl glass shadow-card"
+      >
+        <div className="p-6 md:p-8">
+          <motion.p
+            variants={fadeUp}
+            custom={0}
+            className="flex items-start gap-3 font-body text-lg text-charcoal/80 md:text-xl"
+          >
+            <MapPin size={22} className="mt-1 shrink-0 text-gold" />
+            {weddingData.venue.address}
+          </motion.p>
         </div>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <motion.a whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} href={weddingData.venue.mapUrl} target="_blank" className="min-h-12 rounded-full bg-saffron px-8 py-4 text-white">Get Directions</motion.a>
-          <a href="#" className="min-h-12 rounded-full border border-saffron px-6 py-3 text-saffron">Google Calendar</a>
-          <a href="#" className="min-h-12 rounded-full border border-saffron px-6 py-3 text-saffron">Apple Calendar</a>
+
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-x-0 top-0 z-10 h-8 bg-gradient-to-b from-cream/80 to-transparent" />
+          <iframe
+            title="map"
+            src={weddingData.venue.mapsEmbed}
+            loading="lazy"
+            className="aspect-[16/10] w-full border-0 md:aspect-video"
+          />
         </div>
-      </div>
-    </motion.section>
+
+        <div className="flex flex-wrap gap-3 p-6 md:p-8">
+          <Button as="a" href={weddingData.venue.mapUrl} variant="primary" className="gap-2">
+            <Navigation2 size={16} />
+            Get Directions
+          </Button>
+          <Button as="a" href="#" variant="secondary" className="gap-2">
+            <Calendar size={16} />
+            Google Calendar
+          </Button>
+          <Button as="a" href="#" variant="secondary" className="gap-2">
+            <Calendar size={16} />
+            Apple Calendar
+          </Button>
+        </div>
+      </motion.div>
+    </SectionWrapper>
   );
 }

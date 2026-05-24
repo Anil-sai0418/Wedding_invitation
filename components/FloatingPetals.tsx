@@ -2,16 +2,17 @@
 
 import { motion } from "framer-motion";
 
-const colors = ["#E8882A", "#F2C94C", "#D4856A", "#FFF8DC"];
+const colors = ["#C9A962", "#E8D5A3", "#B8736B", "#FFFBF5"];
 
 export default function FloatingPetals() {
-  const petals = Array.from({ length: 20 }).map((_, i) => ({
+  const petals = Array.from({ length: 16 }).map((_, i) => ({
     id: i,
     left: `${(i * 37) % 100}%`,
-    duration: 8 + (i % 9),
-    scale: 0.4 + ((i * 13) % 8) / 10,
-    opacity: 0.3 + ((i * 7) % 4) / 10,
+    duration: 10 + (i % 8),
+    scale: 0.35 + ((i * 13) % 8) / 12,
+    opacity: 0.25 + ((i * 7) % 4) / 12,
     color: colors[i % colors.length],
+    delay: i * 0.4,
   }));
 
   return (
@@ -19,13 +20,30 @@ export default function FloatingPetals() {
       {petals.map((petal) => (
         <motion.div
           key={petal.id}
-          className="absolute -top-20"
+          className="absolute -top-16"
           style={{ left: petal.left }}
-          animate={{ y: ["-100px", "110vh"], x: [0, 30, -30, 15, 0], rotate: [0, 90, 180, 360] }}
-          transition={{ duration: petal.duration, repeat: Infinity, ease: "linear", delay: petal.id * 0.2 }}
+          animate={{
+            y: ["-80px", "110vh"],
+            x: [0, 24, -18, 12, 0],
+            rotate: [0, 120, 240, 360],
+          }}
+          transition={{
+            duration: petal.duration,
+            repeat: Infinity,
+            ease: "linear",
+            delay: petal.delay,
+          }}
         >
-          <svg width="30" height="36" viewBox="0 0 24 24" style={{ opacity: petal.opacity, transform: `scale(${petal.scale})` }}>
-            <path fill={petal.color} d="M12 2C8 7 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-7-8-12Z" />
+          <svg
+            width="24"
+            height="28"
+            viewBox="0 0 24 24"
+            style={{ opacity: petal.opacity, transform: `scale(${petal.scale})` }}
+          >
+            <path
+              fill={petal.color}
+              d="M12 2C8 7 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-7-8-12Z"
+            />
           </svg>
         </motion.div>
       ))}

@@ -1,54 +1,166 @@
 "use client";
 
 import confetti from "canvas-confetti";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Check, Minus, Plus, X } from "lucide-react";
+import SectionWrapper from "@/components/ui/SectionWrapper";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Button from "@/components/ui/Button";
+import { fadeUp } from "@/lib/animations";
 
 type RSVPForm = { name: string; phone: string; guests: number; attending: "yes" | "no" };
 
 export default function RSVPSection() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.2], [60, 0]);
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState("");
-  const { register, handleSubmit, setValue, watch } = useForm<RSVPForm>({ defaultValues: { guests: 2, attending: "yes" } });
+  const { register, handleSubmit, setValue, watch } = useForm<RSVPForm>({
+    defaultValues: { guests: 2, attending: "yes" },
+  });
   const guests = watch("guests");
+  const attending = watch("attending");
+
   const onSubmit = () => {
     confetti({ particleCount: 120, spread: 90, origin: { y: 0.7 } });
     setOpen(false);
     setToast("We can't wait to see you! 🌸");
     setTimeout(() => setToast(""), 2200);
   };
+
+  const inputClass =
+    "min-h-12 w-full rounded-xl border border-gold/20 bg-cream px-4 font-body text-charcoal placeholder:text-charcoal/40 transition-all focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20";
+
   return (
-    <motion.section ref={ref} style={{ opacity, y }} className="z-20 px-5 py-16">
-      <h2 className="text-center font-script text-5xl text-temple">Will you join our celebration?</h2>
-      <div className="mt-6 text-center">
-        <button onClick={() => setOpen(true)} className="min-h-12 rounded-full bg-saffron px-10 py-4 text-white">RSVP Now</button>
-      </div>
+    <SectionWrapper id="rsvp" variant="warm">
+      <SectionHeader
+        label="RSVP"
+        title="Will you join our celebration?"
+        subtitle="Your presence would mean the world to us"
+      />
+
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="text-center"
+      >
+        <Button onClick={() => setOpen(true)} variant="primary" className="px-12 py-4 text-base">
+          RSVP Now
+        </Button>
+      </motion.div>
+
       <AnimatePresence>
         {open && (
-          <motion.div className="fixed inset-0 z-[95] bg-black/30 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.form onSubmit={handleSubmit(onSubmit)} initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="absolute bottom-0 w-full rounded-t-3xl bg-marble p-5">
-              <input {...register("name", { required: true })} placeholder="Your Name" className="mb-3 min-h-12 w-full rounded-xl border border-silk bg-jasmine px-3 focus:outline-none focus:ring-2 focus:ring-saffron" />
-              <input {...register("phone", { required: true })} placeholder="Phone Number" className="mb-3 min-h-12 w-full rounded-xl border border-silk bg-jasmine px-3 focus:outline-none focus:ring-2 focus:ring-saffron" />
-              <div className="mb-3 flex items-center gap-2">
-                <button type="button" onClick={() => setValue("guests", Math.max(1, guests - 1))} className="min-h-12 min-w-12 rounded-xl border border-silk">-</button>
-                <div className="min-h-12 flex-1 rounded-xl border border-silk bg-jasmine text-center leading-[3rem]">{guests} guests</div>
-                <button type="button" onClick={() => setValue("guests", guests + 1)} className="min-h-12 min-w-12 rounded-xl border border-silk">+</button>
+          <motion.div
+            className="fixed inset-0 z-[95] flex items-end justify-center bg-charcoal/40 backdrop-blur-sm md:items-center md:p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+          >
+            <motion.form
+              onSubmit={handleSubmit(onSubmit)}
+              onClick={(e) => e.stopPropagation()}
+              initial={{ y: "100%", opacity: 0.8 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0.8 }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="w-full max-w-lg rounded-t-3xl border border-gold/15 bg-ivory p-6 shadow-gold-lg md:rounded-3xl md:p-8"
+            >
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="font-display text-2xl text-maroon">Your RSVP</h3>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-10 min-w-10 items-center justify-center rounded-full border border-gold/20 text-charcoal/60 hover:bg-gold/5"
+                >
+                  <X size={18} />
+                </button>
               </div>
-              <div className="mb-3 grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => setValue("attending", "yes")} className="min-h-12 rounded-full border border-silk bg-jasmine">Yes, I&apos;ll be there!</button>
-                <button type="button" onClick={() => setValue("attending", "no")} className="min-h-12 rounded-full border border-silk bg-jasmine">Sending love from afar</button>
+
+              <input
+                {...register("name", { required: true })}
+                placeholder="Your Name"
+                className={`${inputClass} mb-4`}
+              />
+              <input
+                {...register("phone", { required: true })}
+                placeholder="Phone Number"
+                className={`${inputClass} mb-4`}
+              />
+
+              <div className="mb-4 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setValue("guests", Math.max(1, guests - 1))}
+                  className="flex min-h-12 min-w-12 items-center justify-center rounded-xl border border-gold/20 bg-cream transition-colors hover:border-gold"
+                >
+                  <Minus size={18} />
+                </button>
+                <motion.div
+                  key={guests}
+                  initial={{ scale: 0.95 }}
+                  animate={{ scale: 1 }}
+                  className="min-h-12 flex-1 rounded-xl border border-gold/20 bg-cream text-center font-ceremonial leading-[3rem] text-maroon"
+                >
+                  {guests} {guests === 1 ? "guest" : "guests"}
+                </motion.div>
+                <button
+                  type="button"
+                  onClick={() => setValue("guests", guests + 1)}
+                  className="flex min-h-12 min-w-12 items-center justify-center rounded-xl border border-gold/20 bg-cream transition-colors hover:border-gold"
+                >
+                  <Plus size={18} />
+                </button>
               </div>
-              <button className="min-h-12 w-full rounded-full bg-saffron text-white">Submit RSVP</button>
+
+              <div className="mb-6 grid grid-cols-2 gap-3">
+                {(
+                  [
+                    { value: "yes" as const, label: "Yes, I'll be there!" },
+                    { value: "no" as const, label: "Sending love from afar" },
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setValue("attending", opt.value)}
+                    className={`relative min-h-12 rounded-xl border px-3 font-ceremonial text-xs transition-all md:text-sm ${
+                      attending === opt.value
+                        ? "border-gold bg-gold/10 text-maroon"
+                        : "border-gold/20 bg-cream text-charcoal/70 hover:border-gold/40"
+                    }`}
+                  >
+                    {attending === opt.value && (
+                      <Check size={14} className="absolute right-2 top-2 text-gold" />
+                    )}
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              <Button type="submit" variant="primary" className="w-full py-4">
+                Submit RSVP
+              </Button>
             </motion.form>
           </motion.div>
         )}
       </AnimatePresence>
-      {!!toast && <div className="fixed right-4 top-4 z-[99] rounded-xl bg-temple px-4 py-3 text-jasmine">{toast}</div>}
-    </motion.section>
+
+      <AnimatePresence>
+        {!!toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, x: 20 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed right-5 top-24 z-[99] rounded-2xl border border-gold/20 bg-charcoal px-5 py-4 font-body text-cream shadow-gold"
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </SectionWrapper>
   );
 }

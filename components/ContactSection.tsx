@@ -1,27 +1,64 @@
 "use client";
 
-import { Phone } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { Phone, MessageCircle } from "lucide-react";
+import { motion } from "framer-motion";
 import { weddingData } from "@/lib/weddingData";
+import SectionWrapper from "@/components/ui/SectionWrapper";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Button from "@/components/ui/Button";
+import { slideIn, staggerContainer } from "@/lib/animations";
 
 export default function ContactSection() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.2], [60, 0]);
   return (
-    <motion.section ref={ref} style={{ opacity, y }} className="z-20 px-5 py-16">
-      <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2">
-        {weddingData.contacts.map((c) => (
-          <article key={c.phone} className="mx-4 rounded-2xl border border-silk bg-jasmine p-6 shadow-md">
-            <h3 className="font-ceremonial text-2xl text-temple">{c.name}</h3>
-            <p className="font-body italic text-copper">{c.relation}</p>
-            <a className="mt-3 flex min-h-12 items-center gap-2 font-body text-inkstone" href={`tel:${c.phone}`}><Phone size={18} /> {c.phone}</a>
-            <a className="mt-3 inline-flex min-h-12 items-center rounded-full bg-[#25D366] px-5 text-white" href={`https://wa.me/${c.phone.replace(/\D/g, "")}`} target="_blank">Chat on WhatsApp</a>
-          </article>
+    <SectionWrapper id="contact">
+      <SectionHeader
+        label="Get in Touch"
+        title="Contact the Family"
+        subtitle="Reach out for any questions about the celebration"
+      />
+
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2"
+      >
+        {weddingData.contacts.map((c, idx) => (
+          <motion.article
+            key={c.phone}
+            variants={slideIn(idx === 0 ? "left" : "right")}
+            whileHover={{ y: -4 }}
+            className="group rounded-3xl border border-gold/15 bg-cream/80 p-8 shadow-card transition-shadow duration-300 hover:shadow-card-hover"
+          >
+            <p className="mb-1 font-ceremonial text-xs tracking-[0.3em] uppercase text-gold">
+              {c.relation}
+            </p>
+            <h3 className="font-display text-3xl text-maroon">{c.name}</h3>
+
+            <div className="mt-6 space-y-3">
+              <a
+                className="flex min-h-12 items-center gap-3 rounded-xl px-4 font-body text-charcoal transition-colors hover:bg-gold/5"
+                href={`tel:${c.phone}`}
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/10 text-gold">
+                  <Phone size={16} />
+                </span>
+                {c.phone}
+              </a>
+              <Button
+                as="a"
+                href={`https://wa.me/${c.phone.replace(/\D/g, "")}`}
+                variant="whatsapp"
+                className="w-full gap-2"
+              >
+                <MessageCircle size={16} />
+                Chat on WhatsApp
+              </Button>
+            </div>
+          </motion.article>
         ))}
-      </div>
-    </motion.section>
+      </motion.div>
+    </SectionWrapper>
   );
 }
